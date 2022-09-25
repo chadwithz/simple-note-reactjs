@@ -22,7 +22,7 @@ function App() {
 
   useEffect(() => {
     getData();
-  }, [data]);
+  }, []);
 
   return (
     <main
@@ -57,11 +57,14 @@ function App() {
             <form
               onSubmit={async (e) => {
                 e.preventDefault();
-                await addDoc(collection(db, "notes"), {
+                const res = await addDoc(collection(db, "notes"), {
                   value: input,
                 });
-                setInput("");
-                setChangeState(false);
+                if (res) {
+                  setInput("");
+                  setChangeState(false);
+                  getData();
+                }
               }}
               style={{ display: "flex" }}
             >
