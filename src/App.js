@@ -1,27 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { setData } from "./Redux/Slicer/AppState";
 import { useDispatch, useSelector } from "react-redux";
-import { db } from "./Firebase";
-import { collection, getDocs, addDoc } from "firebase/firestore/lite";
-const notesCol = collection(db, "notes");
+import { getNotes } from "./Redux/Slicer/Notes";
 
 function App() {
   const dispatch = useDispatch();
-  const Data = useSelector((state) => state.AppState);
-  const { data } = Data;
+  const Data = useSelector((state) => state.Notes);
+  // const { data } = Data;
   const [changeState, setChangeState] = useState(false);
   const [input, setInput] = useState("");
 
   const getData = async () => {
-    const notesSnapshot = await getDocs(notesCol);
-    const notesList = notesSnapshot.docs.map((doc) => doc.data());
-    let temp = [...data];
-    temp = notesList;
-    dispatch(setData(temp));
+    await dispatch(getNotes()).unwrap();
   };
 
   useEffect(() => {
     getData();
+    console.log("Data >>> ", Data);
   }, []);
 
   return (
@@ -35,11 +29,11 @@ function App() {
     >
       <h1 style={{ alignSelf: "center" }}> Todo </h1>
       <ul>
-        {data.map((val, index) => (
-          <li onClick={() => {}} key={`${index}-list`}>
-            {val.value}
-          </li>
-        ))}
+        {/* {data.map((val, index) => ( */}
+        {/*   <li onClick={() => {}} key={`${index}-list`}> */}
+        {/*     {val.value} */}
+        {/*   </li> */}
+        {/* ))} */}
         <li>
           {!changeState ? (
             <button
@@ -57,14 +51,8 @@ function App() {
             <form
               onSubmit={async (e) => {
                 e.preventDefault();
-                const res = await addDoc(collection(db, "notes"), {
-                  value: input,
-                });
-                if (res) {
-                  setInput("");
-                  setChangeState(false);
-                  getData();
-                }
+                setInput("");
+                setChangeState(false);
               }}
               style={{ display: "flex" }}
             >
